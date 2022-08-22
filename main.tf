@@ -1,7 +1,7 @@
 data "aws_caller_identity" "current" {
 }
 
-data "aws_iam_policy_document" "elasticcache_kms" {
+data "aws_iam_policy_document" "elasticache_kms" {
   statement {
     actions = [
       "kms:*",
@@ -25,20 +25,20 @@ data "aws_iam_policy_document" "elasticcache_kms" {
     condition {
       test = "StringLike"
       values = [
-        "arn:aws:elasticcache:*:${data.aws_caller_identity.current.account_id}:trail/*",
+        "arn:aws:elasticache:*:${data.aws_caller_identity.current.account_id}:trail/*",
       ]
-      variable = "kms:EncryptionContext:aws:elasticcache:arn"
+      variable = "kms:EncryptionContext:aws:elasticache:arn"
     }
     principals {
       identifiers = [
-        "elasticcache.amazonaws.com",
+        "elasticache.amazonaws.com",
       ]
       type = "Service"
     }
     resources = [
       "*",
     ]
-    sid = "Allow elasticcache to encrypt logs"
+    sid = "Allow elasticache to encrypt logs"
   }
 
   statement {
@@ -47,24 +47,25 @@ data "aws_iam_policy_document" "elasticcache_kms" {
     ]
     principals {
       identifiers = [
-        "elasticcache.amazonaws.com",
+        "elasticache.amazonaws.com",
       ]
       type = "Service"
     }
+    
     resources = [
       "*",
     ]
-    sid = "Allow elasticcache to describe key"
+    sid = "Allow elasticache to describe key"
   }
 }
 
-resource "aws_kms_key" "elasticcache" {
+resource "aws_kms_key" "elasticache" {
   enable_key_rotation = var.enable_key_rotation
-  policy              = data.aws_iam_policy_document.elasticcache_kms.json
+  policy              = data.aws_iam_policy_document.elasticache_kms.json
   
 }
 
-resource "aws_kms_alias" "elasticcache" {
+resource "aws_kms_alias" "elasticache" {
   name          = var.name
-  target_key_id = aws_kms_key.elasticcache.key_id
+  target_key_id = aws_kms_key.elasticache.key_id
 }
